@@ -1,0 +1,204 @@
+//motor a
+#define pwma 3
+#define aIn1 5
+#define aIn2 4
+//motor b
+#define pwmb 9
+#define bIn1 7
+#define bIn2 8
+//puente h
+#define standBy 6
+//dirección del motor
+bool flow_a;
+bool flow_b;
+
+//Sensores de linea
+#define lineSensor_a 3
+#define lineSensor_b 4
+bool isLine_a = false;
+bool isLine_b = false;
+
+//Sensores
+#define sensorLeft 14 // A0 - 14
+#define sensorRight 15 // A1 - 15
+#define sensorSide 16 // A2 - 16
+//checar side de q lado estara, posiblemente cambiar nombre
+float outSensor;
+float d_Left;
+float d_Right;
+float d_Side;
+
+bool isLeft;
+bool isRight;
+bool isSide;
+bool lastSide;
+
+const float ringDistance = 77.0;
+
+//int position; Para opción 2
+//int vel_a; Para
+//int vel_b; opcion 3
+
+void setup()
+{
+  // Motor a
+  pinMode(pwma, OUTPUT);
+  pinMode(aIn1, OUTPUT);
+  pinMode(aIn2, OUTPUT);
+  
+  //Motor b
+  pinMode(pwmb, OUTPUT);
+  pinMode(bIn1, OUTPUT);
+  pinMode(bIn2, OUTPUT);
+  
+  //Para indicar al puente h
+  pinMode(standBy, OUTPUT);
+  
+  //Sensores de linea
+  pinMode(lineSensor_a, INPUT);
+  pinMode(lineSensor_a, INPUT);
+  
+  //Sensores de distancia
+  pinMode(sensorLeft, INPUT);
+  pinMode(sensorRight, INPUT);
+  pinMode(sensorSide, INPUT);
+
+  lastSide =  distanceCm(sensorSide) < ringDistance;
+}
+
+void loop()
+{
+  binarySearch();
+}
+
+
+/* ~ Para leer sensor de linea ~
+  NO HEMOS CONSIDERADO LA LINEA
+  eye = digitalRead(lineSensor_a);
+*/
+
+
+float distanceCm(uint8_t sensor)
+{
+  outSensor = analogRead(sensor);
+  return 29.988 * pow(outSensor, -1.173);
+  //d internet, checar
+}
+
+void observe()
+{
+  d_Left = distanceCm(sensorLeft);
+  d_Right = distanceCm(sensorRight);
+  d_Side = distanceCm(sensorSide);
+
+  isLeft = d_Left < ringDistance;
+  isRight = d_Right < ringDistance;
+  isSide = d_Side < ringDistance;
+  //if(isSide) lastSide == true; No estoy seguro
+  //porque 
+}
+
+void walk(int pwra, int pwrb)
+{
+  /* Condicionales para
+    determinar dirección de cada motor */
+
+  flow_a = pwra >= 0;
+  analogWrite(pwma, flow_a ? pwra : -pwra);
+  digitalWrite(aIn1, flow_a ? HIGH : LOW);
+  digitalWrite(aIn2, flow_a ? LOW : HIGH);
+
+  flow_b = pwrb >= 0;
+  analogWrite(pwmb, flow_b ? pwrb : -pwrb);
+  digitalWrite(bIn1, flow_b ? HIGH : LOW);
+  digitalWrite(bIn1, flow_b ? LOW : HIGH);
+
+  digitalWrite(standBy, HIGH);
+}
+
+void turn(char where)
+{
+  //string estaba dando problemas raros
+  if(where == "L"){
+    walk(-100, 100);//izq¿¿¿
+  }
+  else if(where == "R"){
+    walk(100, -100);//Derecha¿¿
+  }
+}
+
+void locate()
+{
+  /* ~Aún no se concreta la lógica de lastSize
+      pretende guardar dónde se encuentra el otro robot
+      ayudandose del sensorSize pero también considerando
+      por dónde se desvío si lo llega a perder*/
+  while(!isLeft && !isRight)
+  {
+    turn(lastSide ? "L" : "R");//1:0 +facil -claro
+    observe();
+  }
+  // En caso de que necesite compensar
+  //turn(lastSide ? "RIGHT" : "LEFT");
+}
+
+void binarySearch()
+{
+  observe();
+  locate();
+
+  if(isLeft && isRight){
+    walk(200, 200); //nose q potencia quieran poner
+  }
+  else if(isLeft){
+    walk(100, 200);
+    lastSide = true;
+  }
+  else{
+    walk(200, 100);
+    lastSide = false;
+  }
+
+}
+
+/* ~ SEGUNDA OPCION ~
+  -Dentro de observe() agregar
+  position = ( (isLeft*10) + (isRight*20) ) / 2;
+  cambiar en locate() while(!isLeft && !isRight) por
+  while(position == 0);
+void binarySearch()
+{
+  observe();
+  locate();
+
+  if(position == 15){
+    walk(200, 200); //nose q potencia quieran poner
+  }
+  else if(position == 5){
+    walk(100, 200);
+  }
+  else{
+    walk(200, 100);
+  }
+
+  lastSide = position == 5;
+
+} */
+
+/* ~ TERCERA OPCIÓN ~
+ Si tiene que girar a la derecha
+ vel_a irá 100 más rapido
+void binarySearch()
+{
+  observe();
+  locate();
+
+  vel_a = 100 + (100*isRight);
+  vel_b = 100 + (100*isLeft);
+
+  if( vel_a + vel_b == 300){
+    lastSide = isLeft;
+  }
+
+  walk(vel_a, vel_b);
+} /*
