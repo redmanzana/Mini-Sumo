@@ -1,5 +1,6 @@
 //eSTA VERSION NO TIENE WALK PERO UNIR CON LA D ISAI  
-
+//COMO NO SABEMOS USAR GITHUB ESCRIBAN ALGO X AQ SI MODIFICAN
+//hola - alex
 
 void setup() {
   pinMode(lineSensor_a, OUTPUT);
