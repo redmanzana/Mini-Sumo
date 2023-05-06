@@ -1,0 +1,43 @@
+//eSTA VERSION NO TIENE WALK PERO UNIR CON LA D ISAI  
+
+
+void setup() {
+  pinMode(lineSensor_a, OUTPUT);
+  pinMode(lineSensor_a, OUTPUT);
+
+  pinMode(distanceSensorLeft, OUTPUT);
+  pinMode(distanceSensorMiddle, OUTPUT);
+  pinMode(distanceSensorRight, OUTPUT);
+//checar si se puede hacer for(14-16) :p
+}
+void DefenseMode(){
+
+}
+
+void SearchMode(){
+  //creo isai tenia una parecida
+}
+
+void AttackMode(){
+  if()
+}
+
+void DistanceCm(distanceSensor){
+  OutputRead = analogRead(distanceSensor0)
+  return 29.988 * pow(OutputRead, -1.173)
+  //d internet, checar
+}
+
+void loop() {
+  distanceLeft = DistanceCm(outputReadLeft);
+  distanceMiddle = DistanceCm(outputReadMiddle);
+  distanceRight = DistanceCm(outputReadRight);
+  delay(50)
+
+  if(Distance)
+  //Run
+  Walk()
+
+}
+
+{}
