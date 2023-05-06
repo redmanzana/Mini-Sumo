@@ -1,44 +1,122 @@
-//eSTA VERSION NO TIENE WALK PERO UNIR CON LA D ISAI  
-//COMO NO SABEMOS USAR GITHUB ESCRIBAN ALGO X AQ SI MODIFICAN
-//hola - alex
+//motor a
+#define pwma 3
+#define aIn1 5
+#define aIn2 4
+//motor b
+#define pwmb 9
+#define bIn1 7
+#define bIn2 8
+//puente h
+#define standBy 6
+//dirección del motor
+bool flow_a;
+bool flow_b;
 
-void setup() {
+//Sensores de linea
+#define lineSensor_a 3
+#define lineSensor_b 4
+bool isLine_a = false;
+bool isLine_b = false;
+
+//Sensores
+#define sensorLeft 14 // A0 - 14
+#define sensorMiddle 15 // A1 - 15
+#define sensorRight 16 // A2 - 16
+
+
+float outputReadLeft;
+float distanceLeft;
+float outputReadMiddle;
+float distanceMiddle;
+float outputReadMiddle;
+float distanceMiddle;
+
+const int RingDistance = 77;
+
+void setup()
+{
+  // Motor a
+  pinMode(pwma, OUTPUT);
+  pinMode(aIn1, OUTPUT);
+  pinMode(aIn2, OUTPUT);
+  //Motor b
+  pinMode(pwmb, OUTPUT);
+  pinMode(bIn1, OUTPUT);
+  pinMode(bIn2, OUTPUT);
+  //Para indicar al puente h
+  pinMode(standBy, OUTPUT);
+  //Sensores de linea
   pinMode(lineSensor_a, OUTPUT);
   pinMode(lineSensor_a, OUTPUT);
-
-  pinMode(distanceSensorLeft, OUTPUT);
-  pinMode(distanceSensorMiddle, OUTPUT);
-  pinMode(distanceSensorRight, OUTPUT);
-//checar si se puede hacer for(14-16) :p
-}
-void DefenseMode(){
-
+  //Sensores de distancia
+  pinMode(sensorLeft, OUTPUT);
+  pinMode(sensorMiddle, OUTPUT);
+  pinMode(sensorRight, OUTPUT);
 }
 
-void SearchMode(){
+void walk(int pwra, int pwrb)
+{
+  /* Condicionales para
+    determinar dirección de cada motor */
+
+  waya = pwra >= 0;
+  analogWrite(pwma, waya ? pwra : -pwra);
+  digitalWrite(aIn1, waya ? HIGH : LOW);
+  digitalWrite(aIn2, waya ? LOW : HIGH);
+
+  wayb = pwrb >= 0;
+  analogWrite(pwmb, wayb ? pwrb : -pwrb);
+  digitalWrite(bIn1, wayb ? HIGH : LOW);
+  digitalWrite(bIn1, wayb ? LOW : HIGH);
+
+  digitalWrite(standBy, HIGH);
+}
+
+/* ~ Para leer sensor de linea ~
+  eye = digitalRead(watcher);
+*/
+
+float tTravel()
+{
+  digitalWrite(shouter, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(shouter, LOW);
+
+  return pulseIn(listener, HIGH);
+}
+
+float distance()
+{
+  return tTravel() * .017;
+}
+
+void defenseMode(){
+
+}
+
+void searchMode(){
   //creo isai tenia una parecida
 }
 
-void AttackMode(){
+void attackMode(){
   if()
 }
 
-void DistanceCm(distanceSensor){
-  OutputRead = analogRead(distanceSensor0)
-  return 29.988 * pow(OutputRead, -1.173)
+void distanceCm(int distanceSensor)
+{
+  OutputRead = analogRead(distanceSensor);
+  return 29.988 * pow(OutputRead, -1.173);
   //d internet, checar
 }
 
 void loop() {
-  distanceLeft = DistanceCm(outputReadLeft);
-  distanceMiddle = DistanceCm(outputReadMiddle);
-  distanceRight = DistanceCm(outputReadRight);
-  delay(50)
+  distanceLeft = distanceCm(sensorLeft);
+  distanceMiddle = distanceCm(sensorMiddle);
+  distanceRight = distanceCm(sensorRight);
+  delay(50);
 
-  if(Distance)
-  //Run
-  Walk()
+  if(distance)
+    //Run;
+  walk();
 
 }
-
-{}
