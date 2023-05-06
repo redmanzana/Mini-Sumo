@@ -115,9 +115,5 @@ void loop() {
   distanceRight = distanceCm(sensorRight);
   distanceSide = distanceCm(sensorSide);
   delay(50);
-
-  if(distance)
-    //Run;
-  walk();
-
+ 
 }
