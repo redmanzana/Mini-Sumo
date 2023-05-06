@@ -20,18 +20,15 @@ bool isLine_b = false;
 
 //Sensores
 #define sensorLeft 14 // A0 - 14
-#define sensorMiddle 15 // A1 - 15
-#define sensorRight 16 // A2 - 16
-
-
-float outputReadLeft;
+#define sensorRight 15 // A1 - 15
+#define sensorSide 16 // A2 - 16
+//checar side de q lado estara, posiblemente cambiar nombre
+float outSensor;
 float distanceLeft;
-float outputReadMiddle;
-float distanceMiddle;
-float outputReadMiddle;
-float distanceMiddle;
+float distanceRight;
+float distanceSide;
 
-const int RingDistance = 77;
+const int ringDistance = 77;
 
 void setup()
 {
@@ -39,15 +36,19 @@ void setup()
   pinMode(pwma, OUTPUT);
   pinMode(aIn1, OUTPUT);
   pinMode(aIn2, OUTPUT);
+  
   //Motor b
   pinMode(pwmb, OUTPUT);
   pinMode(bIn1, OUTPUT);
   pinMode(bIn2, OUTPUT);
+  
   //Para indicar al puente h
   pinMode(standBy, OUTPUT);
+  
   //Sensores de linea
   pinMode(lineSensor_a, OUTPUT);
   pinMode(lineSensor_a, OUTPUT);
+  
   //Sensores de distancia
   pinMode(sensorLeft, OUTPUT);
   pinMode(sensorMiddle, OUTPUT);
@@ -59,12 +60,12 @@ void walk(int pwra, int pwrb)
   /* Condicionales para
     determinar dirección de cada motor */
 
-  waya = pwra >= 0;
-  analogWrite(pwma, waya ? pwra : -pwra);
-  digitalWrite(aIn1, waya ? HIGH : LOW);
+  flow_a = pwra >= 0;
+  analogWrite(pwma, flow_a ? pwra : -pwra);
+  digitalWrite(aIn1, flow_a ? HIGH : LOW);
   digitalWrite(aIn2, waya ? LOW : HIGH);
 
-  wayb = pwrb >= 0;
+  flow_b = pwrb >= 0;
   analogWrite(pwmb, wayb ? pwrb : -pwrb);
   digitalWrite(bIn1, wayb ? HIGH : LOW);
   digitalWrite(bIn1, wayb ? LOW : HIGH);
@@ -76,43 +77,43 @@ void walk(int pwra, int pwrb)
   eye = digitalRead(watcher);
 */
 
-float tTravel()
+void Turn(String Where){
+  if(Where == "LEFT"){
+    walk(-100,100)//izq¿¿¿
+  }
+
+  else if(Where == "RIGHT"){
+    walk(100,-100)//Derecha¿¿
+  }
+}
+
+void binarySearch(float d_Left, float d_Right, float d_Side){
+  isLeft = d_Left < ringDistance;
+  isRight = d_Right < ringDistance;
+  isSide = d_Side < ringDistance;
+
+  
+
+  if(isLeft && isRight){
+    walk(200, 200) //nose q potencia quieran poner
+  }
+
+  else{
+    Turn(isSide ? "LEFT" : "RIGHT");//1:0 +facil -claro
+  }
+}
+
+float distanceCm(int sensor)
 {
-  digitalWrite(shouter, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(shouter, LOW);
-
-  return pulseIn(listener, HIGH);
-}
-
-float distance()
-{
-  return tTravel() * .017;
-}
-
-void defenseMode(){
-
-}
-
-void searchMode(){
-  //creo isai tenia una parecida
-}
-
-void attackMode(){
-  if()
-}
-
-void distanceCm(int distanceSensor)
-{
-  OutputRead = analogRead(distanceSensor);
-  return 29.988 * pow(OutputRead, -1.173);
+  outSensor = analogRead(sensor);
+  return 29.988 * pow(outSensor, -1.173);
   //d internet, checar
 }
 
 void loop() {
   distanceLeft = distanceCm(sensorLeft);
-  distanceMiddle = distanceCm(sensorMiddle);
   distanceRight = distanceCm(sensorRight);
+  distanceSide = distanceCm(sensorSide);
   delay(50);
 
   if(distance)
