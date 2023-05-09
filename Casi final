@@ -1,0 +1,162 @@
+//motor a
+#define pwma 3
+#define aIn1 5
+#define aIn2 4
+//motor b
+#define pwmb 9
+#define bIn1 7
+#define bIn2 8
+//puente h
+#define standBy 6
+//dirección del motor
+bool flow_a;
+bool flow_b;
+
+//Arrancador
+#define go 10
+
+//Sensores de linea
+#define lineSensor_a 3
+#define lineSensor_b 4
+bool isLine_a = false;
+bool isLine_b = false;
+
+//Sensores
+#define sensorLeft 14 // A0 - 14
+#define sensorRight 15 // A1 - 15
+#define sensorSide 16 // A2 - 16
+//checar side de q lado estara, posiblemente cambiar nombre
+float outSensor;
+
+bool isLeft;
+bool isRight;
+bool isSide;
+bool lastSide;
+
+int vel_a;
+int vel_b;
+
+void setup()
+{
+  // Motor a
+  pinMode(pwma, OUTPUT);
+  pinMode(aIn1, OUTPUT);
+  pinMode(aIn2, OUTPUT);
+  
+  //Motor b
+  pinMode(pwmb, OUTPUT);
+  pinMode(bIn1, OUTPUT);
+  pinMode(bIn2, OUTPUT);
+  
+  //Para indicar al puente h
+  pinMode(standBy, OUTPUT);
+
+  //Arrancado
+  pinMode(go, INPUT);
+  
+  //Sensores de linea
+  pinMode(lineSensor_a, INPUT);
+  pinMode(lineSensor_b, INPUT);
+  
+  //Sensores de distancia
+  pinMode(sensorLeft, INPUT);
+  pinMode(sensorRight, INPUT);
+  pinMode(sensorSide, INPUT);
+
+  lastSide =  distanceCm(sensorSide);
+}
+
+void loop()
+{
+  while(digitalRead(go))
+  {
+    binarySearch();
+  }
+  walk(0, 0);
+}
+
+
+float distanceCm(uint8_t sensor)
+{
+  outSensor = analogRead(sensor);
+  if(outSensor < 100) 
+    return true;
+  return false;
+}
+
+void observe()
+{
+  isLine_a = digitalRead(lineSensor_a);
+  isLine_b = digitalRead(lineSensor_b);
+
+  isLeft = distanceCm(sensorLeft);
+  isRight = distanceCm(sensorRight);
+  isSide = distanceCm(sensorSide);
+  if(isSide)
+    lastSide == true;
+}
+
+void walk(int pwra, int pwrb)
+{
+  /* Condicionales para
+    determinar dirección de cada motor */
+
+  flow_a = pwra >= 0;
+  analogWrite(pwma, flow_a ? pwra : -pwra);
+  digitalWrite(aIn1, flow_a ? HIGH : LOW);
+  digitalWrite(aIn2, flow_a ? LOW : HIGH);
+
+  flow_b = pwrb >= 0;
+  analogWrite(pwmb, flow_b ? pwrb : -pwrb);
+  digitalWrite(bIn1, flow_b ? HIGH : LOW);
+  digitalWrite(bIn1, flow_b ? LOW : HIGH);
+
+  digitalWrite(standBy, HIGH);
+}
+
+void turn(char where)
+{
+  if(where == "L"){
+    walk(-100, 100);
+  }
+  else if(where == "R"){
+    walk(100, -100);
+  }
+}
+
+void inLimit()
+{
+  if(isLine_a || isLine_b)
+  {
+    walk(-100, -100);
+    delay(500);
+    walk(0, 0);
+  }
+}
+
+void locate()
+{
+  while(!isLeft && !isRight)
+  {
+    turn(lastSide ? "R" : "L");//1:0 +facil -claro
+    observe();
+  }
+  // En caso de que necesite compensar
+  //turn(lastSide ? "L" : "R");
+}
+
+void binarySearch()
+{
+  observe();
+  inLimit();
+  locate();
+
+  vel_a = 50 + (100*isRight);
+  vel_b = 50 + (100*isLeft);
+
+  if( vel_a + vel_b == 150){
+    lastSide = isRight;
+  }
+
+  walk(vel_a, vel_b);
+} 
